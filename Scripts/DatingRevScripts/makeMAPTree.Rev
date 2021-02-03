@@ -1,0 +1,13 @@
+# print errors for undefined variables
+if (!exists("fname_stem"))    "ERROR: `fname_stem` undefined"  # Starting tree
+
+
+# Now, we will analyze the tree output.
+# Let us start by reading in the tree trace
+treetrace = readTreeTrace(fname_stem+".trees", treetype="clock", burnin=0.25)
+
+map_tree = mapTree(treetrace,fname_stem+".tree")
+
+# you may want to quit RevBayes now
+q()
+

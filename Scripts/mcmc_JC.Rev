@@ -5,7 +5,7 @@
 #
 ################################################################################
 
-num_generations = 20000
+num_generations = 5000
 ### Read in sequence data for both genes
 data = readDiscreteCharacterData(aln_file)
 print ("\n\tRead alignment")

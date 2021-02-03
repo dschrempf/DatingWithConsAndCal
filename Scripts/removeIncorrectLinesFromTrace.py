@@ -24,10 +24,12 @@ with open (file, "r") as f:
                     try :
                         if not (li[4].startswith("(((((((T_15[&index=102]:") and li[4].endswith(")[&index=203]:0.000000;")):
                             raise(Exception('not properly formatted tree'))
+                        elif "&&" in li[4]:
+                            raise(Exception("tree contains '&&'"))
                         t = readAnnotatedChronogramWithoutAnnotations ( li[4] )
                         fo.write(l)
-                    except:
-                        print("\n\t\tImproper tree at line "+str(numLine) + " :\n" + l)
+                    except Exception as err:
+                        print("\n\t\tImproper tree at line "+str(numLine) + " :\n" + l +"{0}".format(err))
                         numRemoved += 1
                 else:
                     print("\n\t\tNot 5 words at line: "+str(numLine) + " :\n" + l)

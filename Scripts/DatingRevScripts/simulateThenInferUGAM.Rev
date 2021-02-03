@@ -142,7 +142,7 @@ writeFasta(filename=aln_file, data=seq)
 ###############################
 ###############################
 print("\n\t\tInferring branch lengths trees")
-source("../Scripts/mcmc_JC.Rev")
+#TEMP source("../Scripts/mcmc_JC.Rev")
 
 clear()
 
@@ -194,8 +194,8 @@ constrain = false
 
 extension = ""
 
-mcmc_length = 300000/6.
-mcmc_burnin = 10000*1
+mcmc_length = 30000/6.
+mcmc_burnin = 100*1
 mcmc_nchains = 1
 mcmc_printgen = 100
 
@@ -300,8 +300,10 @@ if (ctmc=="BL" || initialize_rates) {
 # Rate Model   #
 ################
 
-global_rate_mean <- 0.01 #~ dnExp(1)
-sigma <- 0.05  # ~ dnExp(10.0)
+#global_rate_mean <- 0.01 #~ dnExp(1)
+#sigma <- 0.05  # ~ dnExp(10.0)
+global_rate_mean ~ dnExp(1)
+sigma ~ dnExp(10.0)
 
 first_gamma_param := 1/sigma
 second_gamma_param := 1/sigma

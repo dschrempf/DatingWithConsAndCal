@@ -20,7 +20,7 @@ constrain=true
 
 extension = ""
 
-mcmc_length = 300000/6.
+mcmc_length = 100000   #300000/6.
 mcmc_burnin = 10000*1
 mcmc_nchains = 1
 mcmc_printgen = 100
@@ -33,7 +33,7 @@ hyper_weigth=3.0
 initialize_rates=false #true
 
 #reading bug fix
-var_scaling=1
+var_scaling<-1
 
 #calibrations
 calib_file=calibration_file
@@ -111,12 +111,29 @@ if (time_moves)
 # We fix the tree
 psi.setValue(tree)
 
+print("Starting time tree:")
 print(psi)
 
 #read mean and var bls
 if (ctmc=="BL" || initialize_rates) {
-  mean_tree <- readTrees(mean_tree_file)[1]
-  var_tree <- readTrees(var_tree_file)[1]
+  mean_tree <- readBranchLengthTrees(mean_tree_file)[1]
+  var_tree <- readBranchLengthTrees(var_tree_file)[1]
+  print("Unrooted tree with Mean Branch Lengths:")
+  print(mean_tree)
+
+  rootId <- tree.getRootIndex()
+  outgroup <- tree.getDescendantTaxa(rootId)
+
+  ### REROOT AND MAKE BIFURCATING
+  mean_tree.reRootAndMakeBifurcating(clade(outgroup))
+  var_tree.reRootAndMakeBifurcating(clade(outgroup))
+
+  ### RENUMBERING
+  mean_tree.renumberNodes(tree)
+  var_tree.renumberNodes(tree)
+
+  print("Tree with Mean Branch Lengths:")
+  print(mean_tree)
   source("Scripts/DatingRevScripts/readBLTrees.Rev");
 }
 
@@ -160,10 +177,10 @@ if (mc3=="true") {
 }
 fname_stem=handle+extension
 monitors[++mni] = mnModel(filename=fname_stem+".log",printgen=10, separator = TAB)
-monitors[++mni] = mnStochasticVariable(filename=fname_stem+"_Stoch.log",printgen=10)
+monitors[++mni] = mnStochasticVariable(filename=fname_stem+"_Stoch.log",printgen=40)
 
-monitors[++mni] = mnExtNewick(filename=fname_stem+".trees", isNodeParameter=FALSE, printgen=10, separator = TAB, tree=psi, branch_rates)
-monitors[++mni] = mnScreen(printgen=mcmc_printgen, root_time, ages[103], ages[110], ages[150])
+monitors[++mni] = mnExtNewick(filename=fname_stem+".trees", isNodeParameter=FALSE, printgen=40, separator = TAB, tree=psi, branch_rates)
+monitors[++mni] = mnScreen(printgen=mcmc_printgen, root_time)
 
 if (mc3=="true") {
   mymcmc = mcmcmc(mymodel, monitors, moves, nruns=1, nchains=4, tuneHeat=TRUE)

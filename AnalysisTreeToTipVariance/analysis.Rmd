@@ -1,0 +1,60 @@
+---
+title: "Analysis Tree to tip variances"
+output: html_notebook
+---
+
+```{r}
+dhog<- read.table("newick_template_trees.rooted.stats", h=T)
+dsim <- read.table("proposedTree_rescaled_altered.stats", h=T)
+```
+
+
+```{r}
+plot(dhog$num, dhog$sd, pch=20, col=rgb(0,0,0,0.5), log="x")
+points(dsim$num, dsim$sd, col="red", pch=20)
+```
+
+```{r}
+hogsel <- dhog[which(dhog$num>=90 & dhog$num <=110), ]
+```
+
+```{r}
+dim(hogsel)
+```
+
+
+```{r}
+plot(jitter(hogsel$num, 1), hogsel$var, pch=20, col=rgb(0,0,0,0.3), log="x", ylab="Normalized variance", xlab="Number of sequences")
+points(dsim$num, dsim$var, col="red", pch=20)
+```
+
+
+```{r}
+boxplot(hogsel$var)
+points(1, dsim$var, col="red", pch=20)
+
+```
+
+```{r}
+par(mfrow=c(1, 2))
+plot(jitter(hogsel$num, 1), hogsel$var, pch=20, col=rgb(0,0,0,0.3), log="x", ylab="Normalized variance", xlab="Number of sequences")
+points(dsim$num, dsim$var, col="red", pch=20, cex=2)
+boxplot(hogsel$var, ylab="Normalized variance", pch=20)
+points(1, dsim$var, col="red", pch=20, cex=2)
+
+```
+
+# What is the rank of the simulated tree?
+
+```{r}
+
+length(which(hogsel$var > dsim$var))
+
+```
+So the simulated tree would be the 583rd most variable out of 1289 empirical trees.
+
+```{r}
+length(which(hogsel$var > dsim$var)) / length(hogsel$var)
+```
+
+45% of the empirical trees are more variable; 55% are less variable.

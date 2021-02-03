@@ -49,22 +49,9 @@ cd ..
 ################# First, calibrations.
 # We get 10 calibrations as in Betts et al. 2018.
 
-# 4 ways of sampling constraints:
-- balanced (both sides of the root)
-- unbalanced (one side of the root only)
-- randomly (all nodes have the same probability to be picked)
-- old-biased (older nodes are more likely to be picked; the weight is according to their order in the list of node ages)
-
-
-# Getting old-biased calibrations, on both sides (balanced):
-python Scripts/extractCalibrations.py SimulatedTrees/proposedTree.dnd 10 y y
-
-# Getting old-biased calibrations, on one side only (unbalanced):
-python Scripts/extractCalibrations.py SimulatedTrees/proposedTree.dnd 10 n y
-
 # Getting constraints by hand.
 # The result is in several files:
-# constraints_10.Rev  constraints_15.Rev  constraints_1.Rev  constraints_5.Rev  constraints_full.txt  constraints_informative.Rev  constraints_uninformative.Rev constraints_0.Rev
+# constraints_10.Rev  constraints_15.Rev  constraints_1.Rev  constraints_5.Rev  constraints_full.txt  constraints_informative.Rev  constraints_uninformative.Rev constraints_0.Rev, etc...
 
 
 #########################################################
@@ -74,11 +61,11 @@ python Scripts/extractCalibrations.py SimulatedTrees/proposedTree.dnd 10 n y
 mkdir OutputDating
 
 # dating the tree with balanced calibrations and varying numbers of constraints, on mellifera.elte:
-chmod +x launchDatingBalanced_Elte.sh
-nohup ./launchDatingBalanced_Elte.sh &
+chmod +x launchAllBalancedJobs_Elte.sh
+nohup ./launchAllBalancedJobs_Elte.sh &
 #
 # # dating the tree with unbalanced calibrations and varying numbers of constraints:
-# launchDatingUnbalanced.sh
+nohup ./launchAllUnbalancedJobs_Elte.sh &
 #
 # # dating the tree with 5 informative or uninformative constraints
 # launchDatingInformativeUninformative.sh
@@ -90,55 +77,12 @@ cd OutputDating
 #for i in *.trees ; do awk '{ if (NF==5) {print} }' $i | awk '{ if (NR<2) { print } else if ($0 ~/;$/) { print } }' > ${i/.trees}noMix.trees; echo $i ; wc -l ${i/.trees}noMix.trees; done
 for i in *.trees ; do python ../Scripts/removeIncorrectLinesFromTrace.py $i ${i/.trees}noMix.trees ; done > outputCleaningTraceFiles
 
-# control of what happened:
-# File Cal_10_n_y_Cons_0_cons_BD_UGAMr_BL_MC3.trees : total number of lines that have been removed: 0
-# File Cal_10_n_y_Cons_10_cons_BD_UGAMr_BL_MC3.trees : total number of lines that have been removed: 0
-# File Cal_10_n_y_Cons_11_cons_BD_UGAMr_BL_MC3.trees : total number of lines that have been removed: 5
-# File Cal_10_n_y_Cons_15_cons_BD_UGAMr_BL_MC3.trees : total number of lines that have been removed: 2
-# File Cal_10_n_y_Cons_1_cons_BD_UGAMr_BL_MC3.trees : total number of lines that have been removed: 2
-# File Cal_10_n_y_Cons_2_cons_BD_UGAMr_BL_MC3.trees : total number of lines that have been removed: 12
-# File Cal_10_n_y_Cons_5_cons_BD_UGAMr_BL_MC3.trees : total number of lines that have been removed: 0
-# File Cal_10_n_y_Cons_8_cons_BD_UGAMr_BL_MC3.trees : total number of lines that have been removed: 0
-# File Cal_10_y_y_Cons_0_cons_BD_UGAMr_BL_MC3.trees : total number of lines that have been removed: 0
-# File Cal_10_y_y_Cons_10_cons_BD_UGAMr_BL_MC3.trees : total number of lines that have been removed: 0
-# File Cal_10_y_y_Cons_11_cons_BD_UGAMr_BL_MC3.trees : total number of lines that have been removed: 0
-# File Cal_10_y_y_Cons_12_cons_BD_UGAMr_BL_MC3.trees : total number of lines that have been removed: 21
-# File Cal_10_y_y_Cons_13_cons_BD_UGAMr_BL_MC3.trees : total number of lines that have been removed: 0
-# File Cal_10_y_y_Cons_14_cons_BD_UGAMr_BL_MC3.trees : total number of lines that have been removed: 0
-# File Cal_10_y_y_Cons_15_cons_BD_UGAMr_BL_MC3.trees : total number of lines that have been removed: 62
-# File Cal_10_y_y_Cons_1_cons_BD_UGAMr_BL_MC3.trees : total number of lines that have been removed: 0
-# File Cal_10_y_y_Cons_2_cons_BD_UGAMr_BL_MC3.trees : total number of lines that have been removed: 0
-# File Cal_10_y_y_Cons_3_cons_BD_UGAMr_BL_MC3.trees : total number of lines that have been removed: 0
-# File Cal_10_y_y_Cons_4_cons_BD_UGAMr_BL_MC3.trees : total number of lines that have been removed: 79
-# File Cal_10_y_y_Cons_5_cons_BD_UGAMr_BL_MC3.trees : total number of lines that have been removed: 0
-# File Cal_10_y_y_Cons_6_cons_BD_UGAMr_BL_MC3.trees : total number of lines that have been removed: 0
-# File Cal_10_y_y_Cons_7_cons_BD_UGAMr_BL_MC3.trees : total number of lines that have been removed: 0
-# File Cal_10_y_y_Cons_8_cons_BD_UGAMr_BL_MC3.trees : total number of lines that have been removed: 0
-# File Cal_10_y_y_Cons_9_cons_BD_UGAMr_BL_MC3.trees : total number of lines that have been removed: 0
+# control of what happened: No line has been removed.
 
 
 # Then we can make map trees for each file.
 for i in *noMix.trees ; do echo "fname_stem=\"${i/.trees}\" ; source(\"../Scripts/DatingRevScripts/makeMAPTree.Rev\") ;" | rb ; done
 cd ..
-
-
-
-#########################################################
-# Additional numbers of runs
-#########################################################
-cp constraints_full.txt constraints_2.Rev
-#...
-#and then editing by hand in emacs
-
-cat balanced5Constraint.sh | sed 's/5/2/g' > balanced2Constraint.sh
-#...
-# and then:
-
-for i in balanced14Constraint.sh balanced13Constraint.sh balanced12Constraint.sh balanced11Constraint.sh balanced9Constraint.sh balanced8Constraint.sh balanced7Constraint.sh balanced6Constraint.sh balanced4Constraint.sh balanced3Constraint.sh  balanced2Constraint.sh ; do sed 's/10_y_y/10_n_y/g' $i > un${i}; done
-
-nohup ./launchAdditionalUnbalancedJobs_Elte.sh &
-nohup ./launchAdditionalJobs_Elte.sh &
-
 
 
 ## Analysing the dated trees
@@ -154,31 +98,22 @@ grep -A1 "fracInHPD" resultAllTrees.txt | grep -v "fracInHPD" | grep -v "-" > re
 #########################################################
 # Gathering the trees :
 mkdir OutputDatingInfoUninfo
-scp mellifera.elte.hu:~/DatingWithConsAndCal/OutputDatingInfoUninfo/*.trees OutputDatingInfoUninfo/
+scp -i /home/boussau/.ssh/apismellifera_rsa mellifera.elte.hu:~/DatingWithConsAndCal/OutputDatingInfoUninfo/*.trees OutputDatingInfoUninfo/
 # removing mixed-up lines:
 cd OutputDatingInfoUninfo
-#for i in *.trees ; do awk '{ if (NF==5) {print} }' $i | awk '{ if (NR<2) { print } else if ($0 ~/;$/) { print } }' > ${i/.trees}noMix.trees; echo $i ; wc -l ${i/.trees}noMix.trees; done
-for i in *.trees ; do python ../Scripts/removeIncorrectLinesFromTrace.py $i ${i/.trees}noMix.trees ; done > outputCleaningTraceFiles
-
-# control of what happened:
-grep "total" outputCleaningTraceFiles
-# File Cal_10_n_y_Cons_info_cons_BD_UGAMr_BL_MC3.trees : total number of lines that have been removed: 0
-# File Cal_10_n_y_Cons_uninfo_cons_BD_UGAMr_BL_MC3.trees : total number of lines that have been removed: 0
-# File Cal_10_y_y_Cons_info_cons_BD_UGAMr_BL_MC3.trees : total number of lines that have been removed: 0
-# File Cal_10_y_y_Cons_uninfo_cons_BD_UGAMr_BL_MC3.trees : total number of lines that have been removed: 0
 
 # Then we can make map trees for each file.
-for i in *noMix.trees ; do echo "fname_stem=\"${i/.trees}\" ; source(\"../Scripts/DatingRevScripts/makeMAPTree.Rev\") ;" | rb ; done
+for i in *.trees ; do echo "fname_stem=\"${i/.trees}\" ; source(\"../Scripts/DatingRevScripts/makeMAPTree.Rev\") ;" | rb ; done
 cd ..
 
 ## Analysing the dated trees
-./launchAnalysisInfoUninfo.sh > resultAllTreesInfoUninfo.txt
+./launchAnalysisProximalDistal.sh > resultAllTreesProxiDist.txt
 
-grep -A1 "fracInHPD" resultAllTreesInfoUninfo.txt | grep -v "fracInHPD" | grep -v "-" > resultAllTreesInfoUninfoExcerpt.txt
+grep -A1 "fracInHPD" resultAllTreesProxiDist.txt | grep -v "fracInHPD" | grep -v "-" > resultAllTreesProxiDistExcerpt.txt
 
 # Adding the data with 0 constraint from the previous experiments
 awk '{ if ($3==0) {print} }' resultAllTreesExcerpt.txt > result0Constraints
-cat result0Constraints resultAllTreesInfoUninfoExcerpt.txt > resultAllTreesInfoUninfoExcerptWith0Constraint.txt
+cat result0Constraints resultAllTreesProxiDistExcerpt.txt > resultAllTreesProxiDistExcerptWith0Constraint.txt
 
 # then analysis in Analysis of constraints vs calibrations.ipynb
 

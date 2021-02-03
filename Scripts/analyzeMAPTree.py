@@ -2,7 +2,7 @@ from ete3 import Tree
 import os
 import sys
 from subprocess import call
-from math import sqrt
+from math import sqrt, pow
 import numpy as np
 import scipy
 from sklearn.metrics import mean_squared_error
@@ -67,7 +67,20 @@ for k,v in heightsTrueDict.items():
 #print(heightsMap)
 
 cor = scipy.stats.pearsonr(heightsTrue, heightsMap)
-rmsd = sqrt(mean_squared_error(heightsTrue, heightsMap))
+# rmsd = sqrt(mean_squared_error(y_true=heightsTrue, y_pred=heightsMap,
+#                                multioutput='raw_values', squared=False))
+rmsd_vec = list()
+rmsd_norm_vec = list()
+rmsd = 0.0
+rmsd_norm = 0.0
+for i in range(len(heightsTrue)):
+    rmsd_vec.append(sqrt(pow(heightsTrue[i]-heightsMap[i], 2)))
+    rmsd_norm_vec.append(rmsd_vec[i]/heightsTrue[i])
+    rmsd += rmsd_vec[i]
+    rmsd_norm += rmsd_norm_vec[i]
+
+rmsd = rmsd / len(heightsTrue)
+rmsd_norm = rmsd_norm / len(heightsTrue)
 
 ################################
 # Same thing, but with branch lengths, not node ages
@@ -133,5 +146,5 @@ else :
 #print("Relaxed clock: Out of " + str(HPDMapLen) +" nodes, "+str(tot) +" were in the 95% HPD, i.e. " + str(100*tot/HPDMapLen) + "%.\n")
 
 if verbose_bool:
-    print("TreeId\tnumCalib\tnumCons\tbalanced\told_biased\tcorrelation\trmsd\tcor_bls\trmsd_bls\tnum_nodes\tnumInHPD\tfracInHPD\tpercent0\tpercent25\tpercent50\tpercents75\tpercent100" )
-print(numTree+"\t"+numCalib +"\t"+ numCons +"\t"+ balanced +"\t"+ old_biased +"\t"+ str(cor[0]) +"\t"+ str(rmsd) +"\t"+ str(cor_bls[0]) +"\t"+ str(rmsd_bls) +"\t"+ str(HPDMapLen) +"\t"+ str(tot) + "\t" + str(100*tot/HPDMapLen) + "\t"+ str(percents[0]) +"\t"+ str(percents[1]) +"\t"+ str(percents[2]) +"\t"+ str(percents[3]) +"\t"+ str(percents[4]) )
+    print("TreeId\tnumCalib\tnumCons\tbalanced\told_biased\tcorrelation\trmsd\trmsd_norm\tcor_bls\trmsd_bls\tnum_nodes\tnumInHPD\tfracInHPD\tpercent0\tpercent25\tpercent50\tpercents75\tpercent100" )
+print(numTree+"\t"+numCalib +"\t"+ numCons +"\t"+ balanced +"\t"+ old_biased +"\t"+ str(cor[0]) +"\t"+ str(rmsd) +"\t"+ str(rmsd_norm) +"\t" + str(cor_bls[0]) +"\t"+ str(rmsd_bls) +"\t"+ str(HPDMapLen) +"\t"+ str(tot) + "\t" + str(100*tot/HPDMapLen) + "\t"+ str(percents[0]) +"\t"+ str(percents[1]) +"\t"+ str(percents[2]) +"\t"+ str(percents[3]) +"\t"+ str(percents[4]) )
